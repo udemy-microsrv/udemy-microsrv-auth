@@ -1,6 +1,6 @@
 {
   "name": "udemy-microsrv-auth",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Microservice for managing authentication",
   "author": "Sebastian Torres Cabrera <sebastian.torres0426@gmail.com> (https://github.com/sebasbit)",
   "private": true,
