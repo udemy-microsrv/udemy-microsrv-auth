@@ -6,12 +6,14 @@ import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthJwtPayload } from './types/auth-jwt-payload.type';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prismaService: PrismaService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   private signJwt(payload: AuthJwtPayload): string {
@@ -69,5 +71,25 @@ export class AuthService {
       },
       token: this.signJwt({ id: user.id, email: user.email }),
     };
+  }
+
+  verifyToken(authToken: string) {
+    try {
+      const payload = this.jwtService.verify<AuthJwtPayload>(authToken, {
+        secret: this.configService.get('jwt.secret'),
+      });
+
+      const user = {
+        id: payload.id,
+        email: payload.email,
+      };
+
+      return {
+        user,
+        token: this.signJwt(user),
+      };
+    } catch (error) {
+      throw createRpcException(HttpStatus.UNAUTHORIZED, 'Invalid token');
+    }
   }
 }
